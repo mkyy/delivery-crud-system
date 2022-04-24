@@ -79,9 +79,7 @@ export const MotoboyForm = () => {
         id='company'
         value={actualJob}
         onChange={(e) => setActualJob(e.target.value)}>
-        <option value='Não informado' selected>
-          Escolha uma empresa...
-        </option>
+        <option value='Não informado'>Escolha uma empresa...</option>
         {clients.map((element) => {
           return <option value={element.name}> {element.name} </option>
         })}

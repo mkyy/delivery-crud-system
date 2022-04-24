@@ -3,8 +3,8 @@ import { ClientContext } from '../../context/ClientContext'
 import styled from 'styled-components'
 
 export const ClientForm = () => {
-  const [name, setName] = useState(null)
-  const [cnpj, setCnpj] = useState(null)
+  const [name, setName] = useState()
+  const [cnpj, setCnpj] = useState()
 
   const { clients, setClients } = useContext(ClientContext)
 
