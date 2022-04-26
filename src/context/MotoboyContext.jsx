@@ -1,113 +1,140 @@
-import React, { createContext, useContext, useState } from 'react'
-import { ClientContext } from './ClientContext'
+import React, { createContext, useContext, useRef, useState } from 'react';
+import { ClientContext } from './ClientContext';
 
-export const MotoboyContext = createContext()
+export const MotoboyContext = createContext();
 
 export const MotoboyProvider = ({ children }) => {
-  const { clients, setClients } = useContext(ClientContext)
+  const { clients, setClients } = useContext(ClientContext);
 
-  const [motoboys, setMotoboys] = useState([])
-  const [inputNewName, setInputNewName] = useState()
-  const [inputNewAge, setInputNewAge] = useState()
-  const [inputNewEmail, setInputNewEmail] = useState()
-  const [inputNewJob, setInputNewJob] = useState()
+  const [motoboys, setMotoboys] = useState([]);
+  const [id, setId] = useState(1);
+  const nameRef = useRef('');
+  const ageRef = useRef('');
+  const emailRef = useRef('');
+  const jobRef = useRef('Não informado');
 
-  const removeMotoboy = (name) => {
-    const arrayToReplace = motoboys.filter((element) => element.name !== name)
-    setMotoboys(arrayToReplace)
-  }
+  const createMotoboy = (name, age, email, actualJob) => {
+    let isDuplicated = false;
+    motoboys.forEach(element => {
+      if (element.name === name) {
+        isDuplicated = true;
+      }
+    });
+    if (!isDuplicated) {
+      setMotoboys([
+        {
+          id: id,
+          name: name,
+          nameAtNavigationTab: name,
+          age: age,
+          email: email,
+          actualJob: actualJob,
+        },
+        ...motoboys,
+      ]);
+      setId(id + 1);
+      setClients(
+        clients.map(client => {
+          if (client.name === actualJob) {
+            client.funcionarios.push(name);
+          }
+          return client;
+        })
+      );
+    } else {
+      alert('Oops... já existe um motoboy com esse nome no sistema.');
+    }
+  };
+
+  const removeMotoboy = name => {
+    const arrayToReplace = motoboys.filter(element => element.name !== name);
+    setMotoboys(arrayToReplace);
+  };
 
   const updateMotoboy = (event, name) => {
     // changing button text
-    event.target.classList.add('modify')
-    event.target.textContent = 'SALVAR'
-    //transforming name into a input
+    event.target.classList.add('modify');
+    event.target.textContent = 'SALVAR';
 
+    //transforming name into a input
     setMotoboys(
-      motoboys.map((element) => {
+      motoboys.map(element => {
         if (element.name === name) {
-          setInputNewName(name)
           element.name = (
-            <input
-              type='text'
-              name=''
-              id='update-input'
-              defaultValue={name}
-              onChange={(e) => setInputNewName(e.target.value)}
-            />
-          )
-          setInputNewAge(element.age)
-          let aux = element.age
-          element.age = (
-            <input
-              type='number'
-              name=''
-              id='update-input'
-              defaultValue={aux}
-              onChange={(e) => setInputNewAge(e.target.value)}
-            />
-          )
-          setInputNewEmail(element.email)
-          let auxEmail = element.email
+            <input type='text' name='' id='update-input' defaultValue={name} ref={nameRef} minLength={4} />
+          );
+          element.age = <input type='number' name='' id='update-input' defaultValue={element.age} ref={ageRef} />;
           element.email = (
-            <input
-              type='email'
-              name='email'
-              id='update-input'
-              defaultValue={auxEmail}
-              onChange={(e) => setInputNewEmail(e.target.value)}
-            />
-          )
-          setInputNewJob(element.actualJob)
-          let auxJob = element.actualJob
+            <input type='email' name='email' id='update-input' defaultValue={element.email} ref={emailRef} />
+          );
           element.actualJob = (
-            <select
-              name='actualjob'
-              id=''
-              defaultValue={auxJob}
-              onChange={(e) => setInputNewJob(e.target.value)}>
-              <option value='Não informado' selected>
-                Selecione uma empresa...
-              </option>
-              {clients.map((element) => {
-                return <option value={element.name}> {element.name} </option>
+            <select name='actualjob' id='' defaultValue={element.actualJob} ref={jobRef}>
+              <option value='Não informado'>Selecione uma empresa...</option>
+
+              {clients.map(element => {
+                return (
+                  <option key={element.id} value={element.name}>
+                    {element.name}
+                  </option>
+                );
               })}
             </select>
-          )
+          );
         }
-        return element
+        return element;
       })
-    )
-  }
+    );
+  };
 
-  const saveUpdatesFromMotoboy = (event) => {
-    event.target.classList.remove('modify')
-    event.target.textContent = 'ALTERAR'
+  const saveUpdatesFromMotoboy = event => {
+    event.target.classList.remove('modify');
+    event.target.textContent = 'ALTERAR';
     setMotoboys(
-      motoboys.map((element) => {
+      motoboys.map(element => {
         if (typeof element.name === 'object') {
-          element.name = inputNewName
-          element.nameAtNavigationTab = inputNewName
-          element.age = inputNewAge
-          element.email = inputNewEmail
-          element.actualJob = inputNewJob
+          element.name = nameRef.current.value;
+          element.nameAtNavigationTab = nameRef.current.value;
+          element.age = ageRef.current.value;
+          element.email = emailRef.current.value;
+          element.actualJob = jobRef.current.value;
         }
 
-        return element
+        return element;
       })
-    )
-  }
+    );
+    if (jobRef === 'Não informado') {
+      setClients(
+        clients.map(client => {
+          client.funcionarios = client.funcionarios.filter(funcionario => funcionario !== nameRef.current.value);
+          return client;
+        })
+      );
+    } else {
+      setClients(
+        clients.map(client => {
+          client.funcionarios = client.funcionarios.filter(funcionario => {
+            funcionario !== nameRef;
+          });
+          if (client.name === jobRef.current.value) {
+            client.funcionarios.push(nameRef.current.value);
+          }
+          return client;
+        })
+      );
+    }
+  };
 
   return (
     <MotoboyContext.Provider
       value={{
         motoboys,
-        setMotoboys,
+        createMotoboy,
         removeMotoboy,
         updateMotoboy,
         saveUpdatesFromMotoboy,
-      }}>
+      }}
+    >
       {children}
     </MotoboyContext.Provider>
-  )
-}
+  );
+};

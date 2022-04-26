@@ -1,48 +1,25 @@
-import { useState, useContext } from 'react'
-import styled from 'styled-components'
-import { ClientContext } from '../../context/ClientContext'
-import { MotoboyContext } from '../../context/MotoboyContext'
+import { useState, useContext } from 'react';
+import styled from 'styled-components';
+import { ClientContext } from '../../context/ClientContext';
+import { MotoboyContext } from '../../context/MotoboyContext';
 
 export const MotoboyForm = () => {
-  const [name, setName] = useState('')
-  const [age, setAge] = useState()
-  const [email, setEmail] = useState()
-  const [actualJob, setActualJob] = useState('Não informado')
+  const [name, setName] = useState('');
+  const [age, setAge] = useState('');
+  const [email, setEmail] = useState('example@email.com');
+  const [actualJob, setActualJob] = useState('Não informado');
 
-  const { motoboys, setMotoboys } = useContext(MotoboyContext)
-  const { clients, setClients } = useContext(ClientContext)
+  const { createMotoboy } = useContext(MotoboyContext);
+  const { clients } = useContext(ClientContext);
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    let isDuplicated = false
-    motoboys.forEach((element) => {
-      if (element.name === name) {
-        isDuplicated = true
-      }
-    })
-    if (!isDuplicated) {
-      setMotoboys([
-        {
-          name: name,
-          nameAtNavigationTab: name,
-          age: age,
-          email: email,
-          actualJob: actualJob,
-        },
-        ...motoboys,
-      ])
-      setClients(
-        clients.map((element) => {
-          if (element.name === actualJob) {
-            element.funcionarios.push(name)
-          }
-          return element
-        })
-      )
-    } else {
-      alert('Oops... já existe um motoboy com esse nome no sistema.')
-    }
-  }
+  const handleSubmit = e => {
+    e.preventDefault();
+    createMotoboy(name, age, email, actualJob);
+    setName('');
+    setAge('');
+    setEmail('');
+    setActualJob('Não informado');
+  };
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -50,7 +27,7 @@ export const MotoboyForm = () => {
         type='text'
         placeholder='Nome...'
         value={name}
-        onChange={(e) => setName(e.target.value)}
+        onChange={e => setName(e.target.value)}
         required
         minLength={4}
       />
@@ -61,7 +38,7 @@ export const MotoboyForm = () => {
           id='age'
           value={age}
           placeholder={'Idade...'}
-          onChange={(e) => setAge(e.target.value)}
+          onChange={e => setAge(e.target.value)}
           min={0}
           required
         />
@@ -71,24 +48,24 @@ export const MotoboyForm = () => {
           id='email'
           placeholder='Email...'
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
         />
       </div>
-      <select
-        name='company'
-        id='company'
-        value={actualJob}
-        onChange={(e) => setActualJob(e.target.value)}>
+      <select name='company' id='company' value={actualJob} onChange={e => setActualJob(e.target.value)}>
         <option value='Não informado'>Escolha uma empresa...</option>
-        {clients.map((element) => {
-          return <option value={element.name}> {element.name} </option>
+        {clients.map(element => {
+          return (
+            <option key={element.id} value={element.name}>
+              {element.name}
+            </option>
+          );
         })}
       </select>
 
       <button type='submit'>Cadastrar</button>
     </Form>
-  )
-}
+  );
+};
 
 const Form = styled.form`
   width: 80%;
@@ -123,4 +100,4 @@ const Form = styled.form`
       background: #00a6ff;
     }
   }
-`
+`;

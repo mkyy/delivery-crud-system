@@ -1,36 +1,41 @@
-import { useContext, useState } from 'react'
-import { ClientContext } from '../../context/ClientContext'
-import styled from 'styled-components'
+import { useContext, useState } from 'react';
+import { ClientContext } from '../../context/ClientContext';
+import styled from 'styled-components';
 
 export const ClientForm = () => {
-  const [name, setName] = useState()
-  const [cnpj, setCnpj] = useState()
+  const [id, setId] = useState(1);
+  const [name, setName] = useState('');
+  const [cnpj, setCnpj] = useState('');
 
-  const { clients, setClients } = useContext(ClientContext)
+  const { clients, setClients } = useContext(ClientContext);
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = e => {
+    e.preventDefault();
 
-    let isDuplicated = false
-    clients.forEach((element) => {
+    let isDuplicated = false;
+    clients.forEach(element => {
       if (element.name === name) {
-        isDuplicated = true
+        isDuplicated = true;
       }
-    })
+    });
     if (!isDuplicated) {
       setClients([
         {
+          id: id,
           name: name,
           nameAtNavigationTab: name,
           cnpj: cnpj,
           funcionarios: [],
         },
         ...clients,
-      ])
+      ]);
+      setId(id + 1);
+      setName('');
+      setCnpj('');
     } else {
-      alert('Oops... já existe um cliente com esse nome no sistema.')
+      alert('Oops... já existe um cliente com esse nome no sistema.');
     }
-  }
+  };
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -38,7 +43,7 @@ export const ClientForm = () => {
         type='text'
         placeholder='Nome...'
         value={name}
-        onChange={(e) => setName(e.target.value)}
+        onChange={e => setName(e.target.value)}
         required
         minLength={4}
       />
@@ -48,13 +53,13 @@ export const ClientForm = () => {
         id='age'
         placeholder='CNPJ...'
         value={cnpj}
-        onChange={(e) => setCnpj(e.target.value)}
+        onChange={e => setCnpj(e.target.value)}
       />
 
       <button type='submit'>Cadastrar</button>
     </Form>
-  )
-}
+  );
+};
 
 const Form = styled.form`
   width: 80%;
@@ -86,4 +91,4 @@ const Form = styled.form`
       background: #00a6ff;
     }
   }
-`
+`;
