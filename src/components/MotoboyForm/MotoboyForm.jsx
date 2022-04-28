@@ -22,7 +22,7 @@ export const MotoboyForm = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form className='stats' onSubmit={handleSubmit}>
       <input
         type='text'
         placeholder='Nome...'

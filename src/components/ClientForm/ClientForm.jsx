@@ -38,7 +38,7 @@ export const ClientForm = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form className='stats' onSubmit={handleSubmit}>
       <input
         type='text'
         placeholder='Nome...'

@@ -1,36 +1,26 @@
-import { useContext } from 'react'
-import { ClientContext } from '../../context/ClientContext'
-import { ClientForm } from '../ClientForm/'
-import { Wrapper } from './style'
+import { useContext, useState } from 'react';
+import { ClientContext } from '../../context/ClientContext';
+import { ClientForm } from '../ClientForm/';
+import { ClientItem } from '../ClientItem/ClientItem';
+import { Wrapper } from './style';
 
 export const ClientList = () => {
-  const { clients, removeClient, updateClient, saveUpdatesFromClient } =
-    useContext(ClientContext)
+  const { clients } = useContext(ClientContext);
+  const [page, setPage] = useState();
 
   // essa funcao lida com o evento click em cima de uma option dentro do select
-  const handleClick = (event) => {
-    const getActiveDiv = document.querySelector('.active')
-    if (getActiveDiv) {
-      getActiveDiv.classList.remove('active')
-    }
-
-    const divToBeStyled = document.getElementById(event.target.value)
-    divToBeStyled.classList.add('active')
-  }
-
-  //this function handle the delete element client
-  const removeThisClient = (event) => {
-    removeClient(event.target.value)
-  }
-
-  // this function handle the update element client
-  const updateThisClient = (event) => {
-    if (!event.target.classList.contains('modify')) {
-      updateClient(event, event.target.value)
+  const handleClick = event => {
+    let id = event.target.value;
+    if (id === 'form') {
+      setPage(<ClientForm />);
     } else {
-      saveUpdatesFromClient(event)
+      setPage(<ClientItem id={id} handleRemove={handleRemove} />);
     }
-  }
+  };
+
+  const handleRemove = () => {
+    setPage('');
+  };
 
   return (
     <Wrapper>
@@ -39,39 +29,13 @@ export const ClientList = () => {
           New +
         </option>
         {clients.map((item, index) => (
-          <option onClick={handleClick} value={item.name} key={index}>
+          <option onClick={handleClick} value={item.id} key={item.id}>
             {item.nameAtNavigationTab}
           </option>
         ))}
       </select>
-      <div id='form' className='stats'>
-        <ClientForm />
-      </div>
-      {clients.map((item, index) => (
-        <div id={item.name} className='stats' key={index}>
-          <img src='avatar-business.webp' alt='' />
-          <div className='info-box'>
-            <p>
-              <strong>Nome:</strong> {item.name}
-            </p>
-            <p>
-              <strong>CNPJ:</strong> {item.cnpj}
-            </p>
-            <p>
-              <strong>Funcionarios: </strong>
-              {item.funcionarios.join(' ')}
-            </p>
-            <div className='buttons'>
-              <button value={item.name} onClick={updateThisClient}>
-                ALTERAR
-              </button>
-              <button value={item.name} onClick={removeThisClient}>
-                REMOVER
-              </button>
-            </div>
-          </div>
-        </div>
-      ))}
+
+      {page}
     </Wrapper>
-  )
-}
+  );
+};
